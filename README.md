@@ -30,7 +30,7 @@ To erase the generated code, run `make clean`.
 (2) Run `make`. This creates the executable `slcomp-parser` which can parse a list of file inputs.
 ```
 .../slcomp-parser$ make
-.../slcomp-parser$ ./inductor --check-ent input_file_path1 input_file_path2 input_file_path3 ...
+.../slcomp-parser$ ./slcomp-parser input_file_path1 input_file_path2 input_file_path3 ...
 ```
 
 (3) As an example, here is how you would run the sample scripts in `input/Scripts`:
