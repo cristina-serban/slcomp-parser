@@ -35,7 +35,7 @@ To erase the generated code, run `make clean`.
 
 (3) As an example, here is how you would run the sample scripts in `input/Scripts`:
 ```
-.../slcomp-parser$ ./slcomp-parser --check-ent input/Scripts/01.tst.smt2.sl2
+.../slcomp-parser$ ./slcomp-parser input/Scripts/01.tst.smt2.sl2
 ```
 
 ## Generating documentation ##
