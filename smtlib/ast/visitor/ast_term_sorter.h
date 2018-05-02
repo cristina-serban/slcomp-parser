@@ -35,23 +35,23 @@ namespace smtlib {
         private:
             ITermSorterContextPtr ctx;
 
-            static std::vector<SortPtr> extractReturnSorts(const std::vector<FunInfoPtr>& infos,
+            static std::vector<SortPtr> extractReturnSorts(const std::vector<FunEntryPtr>& entries,
                                                            size_t arity, bool parametric);
 
-            static void extractReturnSorts(const std::vector<FunInfoPtr>& infos,
+            static void extractReturnSorts(const std::vector<FunEntryPtr>& entries,
                                            size_t arity, bool parametric,
                                            std::vector<SortPtr>& accum);
 
-            static std::vector<SortPtr> extractParamMatches(const std::vector<FunInfoPtr>& infos,
+            static std::vector<SortPtr> extractParamMatches(const std::vector<FunEntryPtr>& entries,
                                                             size_t arity, const SortPtr& sort,
                                                             const SymbolStackPtr& stack);
 
-            static void extractParamMatches(const std::vector<FunInfoPtr>& infos,
+            static void extractParamMatches(const std::vector<FunEntryPtr>& entries,
                                             size_t arity, const SortPtr& sort,
                                             const SymbolStackPtr& stack,
                                             std::vector<SortPtr>& accum);
 
-            static std::vector<std::string> extractParamNames(const FunInfoPtr& info);
+            static std::vector<std::string> extractParamNames(const FunEntryPtr& entry);
 
             /**
              * Attempts to unify two sorts

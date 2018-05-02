@@ -9,36 +9,36 @@
 
 namespace smtlib {
     namespace ast {
-        typedef std::unordered_map<std::string, SortInfoPtr> SortInfoMap;
-        typedef std::unordered_map<std::string, std::vector<FunInfoPtr>> FunInfoMap;
-        typedef std::unordered_map<std::string, VarInfoPtr> VarInfoMap;
+        typedef std::unordered_map<std::string, SortEntryPtr> SortEntryMap;
+        typedef std::unordered_map<std::string, std::vector<FunEntryPtr>> FunEntryMap;
+        typedef std::unordered_map<std::string, VarEntryPtr> VarEntryMap;
 
         class SymbolTable {
         private:
-            SortInfoMap sorts;
-            FunInfoMap funs;
-            VarInfoMap vars;
+            SortEntryMap sorts;
+            FunEntryMap funs;
+            VarEntryMap vars;
 
         public:
-            inline SortInfoMap& getSorts() {
+            inline SortEntryMap& getSorts() {
                 return sorts;
             }
 
-            inline FunInfoMap& getFuns() {
+            inline FunEntryMap& getFuns() {
                 return funs;
             }
 
-            inline VarInfoMap& getVars() {
+            inline VarEntryMap& getVars() {
                 return vars;
             }
 
-            SortInfoPtr getSortInfo(const std::string& name);
-            std::vector<FunInfoPtr> getFunInfo(const std::string& name);
-            VarInfoPtr getVarInfo(const std::string& name);
+            SortEntryPtr getSortEntry(const std::string& name);
+            std::vector<FunEntryPtr> getFunEntry(const std::string& name);
+            VarEntryPtr getVarEntry(const std::string& name);
 
-            bool add(const SortInfoPtr& info);
-            bool add(const FunInfoPtr& info);
-            bool add(const VarInfoPtr& info);
+            bool add(const SortEntryPtr& entry);
+            bool add(const FunEntryPtr& entry);
+            bool add(const VarEntryPtr& entry);
 
             void reset();
         };

@@ -7,7 +7,7 @@ set(LIB_GMP gmp)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated")
 
 # CVC4 with `make install`
-include_directories(${CMAKE_SOURCE_DIR} "smtlib" "smtlib/ast")
+include_directories(${CMAKE_SOURCE_DIR} "smtlib" "smtlib/ast" "smtlib/sep")
 
 # CVC4 with `make install` at a non-standard prefix
 # include_directories(${CMAKE_SOURCE_DIR} "smtlib" "smtlib/ast" "smtlib/sep" "PATH-TO-CVC4-PREFIX/include")
@@ -80,6 +80,59 @@ set(SOURCE_FILES
         smtlib/ast/stack/ast_symbol_util.cpp
         smtlib/parser/smtlib_parser.h
         smtlib/parser/smtlib_parser.cpp
+        smtlib/sep/sep_abstract.h
+        smtlib/sep/sep_attribute.h
+        smtlib/sep/sep_attribute.cpp
+        smtlib/sep/sep_basic.h
+        smtlib/sep/sep_basic.cpp
+        smtlib/sep/sep_classes.h
+        smtlib/sep/sep_command.h
+        smtlib/sep/sep_command.cpp
+        smtlib/sep/sep_datatype.h
+        smtlib/sep/sep_datatype.cpp
+        smtlib/sep/sep_fun.h
+        smtlib/sep/sep_fun.cpp
+        smtlib/sep/sep_identifier.h
+        smtlib/sep/sep_identifier.cpp
+        smtlib/sep/sep_interfaces.h
+        smtlib/sep/sep_literal.h
+        smtlib/sep/sep_literal.cpp
+        smtlib/sep/sep_logic.h
+        smtlib/sep/sep_logic.cpp
+        smtlib/sep/sep_match.h
+        smtlib/sep/sep_match.cpp
+        smtlib/sep/sep_script.h
+        smtlib/sep/sep_script.cpp
+        smtlib/sep/sep_sort.h
+        smtlib/sep/sep_sort.cpp
+        smtlib/sep/sep_s_expr.h
+        smtlib/sep/sep_s_expr.cpp
+        smtlib/sep/sep_symbol_decl.h
+        smtlib/sep/sep_symbol_decl.cpp
+        smtlib/sep/sep_term.h
+        smtlib/sep/sep_term.cpp
+        smtlib/sep/sep_theory.h
+        smtlib/sep/sep_theory.cpp
+        smtlib/sep/sep_variable.h
+        smtlib/sep/sep_variable.cpp
+        smtlib/sep/transl/sep_translator.h
+        smtlib/sep/transl/sep_translator.cpp
+        smtlib/sep/stack/sep_symbol_table.h
+        smtlib/sep/stack/sep_symbol_table.cpp
+        smtlib/sep/stack/sep_symbol_util.h
+        smtlib/sep/stack/sep_symbol_util.cpp
+        smtlib/sep/stack/sep_symbol_stack.cpp
+        smtlib/sep/stack/sep_symbol_stack.h
+        smtlib/sep/visitor/sep_heap_checker.h
+        smtlib/sep/visitor/sep_heap_checker.cpp
+        smtlib/sep/visitor/sep_term_sorter.h
+        smtlib/sep/visitor/sep_term_sorter.cpp
+        smtlib/sep/visitor/sep_visitor.h
+        smtlib/sep/visitor/sep_visitor.cpp
+        smtlib/sep/visitor/sep_visitor_extra.h
+        smtlib/sep/visitor/sep_visitor_stack.h
+        smtlib/sep/visitor/sep_visitor_stack.cpp
+        smtlib/sep/visitor/sep_visitor_stack_extra.h
         util/configuration.h
         util/configuration.cpp
         util/error_messages.h

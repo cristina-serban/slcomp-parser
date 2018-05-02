@@ -2,4 +2,4 @@
 
 using namespace smtlib::ast;
 
-SymbolInfo::~SymbolInfo() = default;
+SymbolEntry::~SymbolEntry() = default;

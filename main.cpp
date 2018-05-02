@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     for (const auto& file : files) {
         settings->setInputFromFile(file);
         Execution exec(settings);
-        exec.checkSortedness();
+        exec.checkHeap();
     }
 
     return 0;

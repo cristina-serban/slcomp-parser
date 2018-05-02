@@ -34,16 +34,16 @@ SortednessChecker::NodeErrorPtr SortednessChecker::addError(const string& messag
 
 SortednessChecker::NodeErrorPtr SortednessChecker::addError(const string& message,
                                                             const NodePtr& node,
-                                                            const SymbolInfoPtr& info,
+                                                            const SymbolEntryPtr& entry,
                                                             SortednessChecker::NodeErrorPtr& err) {
     if (!err) {
-        err = std::move(make_shared<NodeError>(std::move(make_shared<Error>(message, info)), node));
+        err = std::move(make_shared<NodeError>(std::move(make_shared<Error>(message, entry)), node));
         if (node && node->filename)
             errors[*(node->filename)].push_back(err);
         else
             errors[""].push_back(err);
     } else {
-        err->errs.push_back(make_shared<Error>(message, info));
+        err->errs.push_back(make_shared<Error>(message, entry));
     }
 
     return err;
@@ -58,113 +58,112 @@ void SortednessChecker::addError(const string& message, const NodePtr& node) {
 }
 
 void SortednessChecker::addError(const string& message, const NodePtr& node,
-                                 const SymbolInfoPtr& info) {
-    NodeErrorPtr err = std::move(make_shared<NodeError>(std::move(make_shared<Error>(message, info)), node));
+                                 const SymbolEntryPtr& entry) {
+    NodeErrorPtr err = std::move(make_shared<NodeError>(std::move(make_shared<Error>(message, entry)), node));
     errors[*(node->filename)].push_back(std::move(err));
 }
 
-SortInfoPtr SortednessChecker::getInfo(const DeclareSortCommandPtr& node) {
-    return make_shared<SortInfo>(std::move(node->symbol->toString()),
+SortEntryPtr SortednessChecker::getEntry(const DeclareSortCommandPtr& node) {
+    return make_shared<SortEntry>(std::move(node->symbol->toString()),
                                  node->arity->value, node);
 }
 
-SortInfoPtr SortednessChecker::getInfo(const DefineSortCommandPtr& node) {
-    return make_shared<SortInfo>(std::move(node->symbol->toString()),
+SortEntryPtr SortednessChecker::getEntry(const DefineSortCommandPtr& node) {
+    return make_shared<SortEntry>(std::move(node->symbol->toString()),
                                  node->parameters.size(),
                                  node->parameters,
                                  ctx->getStack()->expand(node->sort), node);
 }
 
-
-SortInfoPtr SortednessChecker::getInfo(const SortSymbolDeclarationPtr& node) {
-    return make_shared<SortInfo>(std::move(node->identifier->toString()),
+SortEntryPtr SortednessChecker::getEntry(const SortSymbolDeclarationPtr& node) {
+    return make_shared<SortEntry>(std::move(node->identifier->toString()),
                                  node->arity->value,
                                  node->attributes, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const SpecConstFunDeclarationPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const SpecConstFunDeclarationPtr& node) {
     std::vector<SortPtr> sig;
     sig.push_back(ctx->getStack()->expand(node->sort));
-    return make_shared<FunInfo>(std::move(node->constant->toString()),
+    return make_shared<FunEntry>(std::move(node->constant->toString()),
                                 sig, node->attributes, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const MetaSpecConstFunDeclarationPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const MetaSpecConstFunDeclarationPtr& node) {
     std::vector<SortPtr> sig;
     sig.push_back(ctx->getStack()->expand(node->sort));
-    return make_shared<FunInfo>(std::move(node->constant->toString()),
+    return make_shared<FunEntry>(std::move(node->constant->toString()),
                                 sig, node->attributes, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const SimpleFunDeclarationPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const SimpleFunDeclarationPtr& node) {
     std::vector<SortPtr> newsig;
     for (const auto& sort : node->signature) {
         newsig.push_back(ctx->getStack()->expand(sort));
     }
 
-    FunInfoPtr funInfo = make_shared<FunInfo>(std::move(node->identifier->toString()),
+    FunEntryPtr funEntry = make_shared<FunEntry>(std::move(node->identifier->toString()),
                                               newsig, node->attributes, node);
     for (const auto& attr : node->attributes) {
         string attrString = attr->toString();
         if (attrString == KW_RIGHT_ASSOC) {
-            funInfo->assocR = true;
+            funEntry->assocR = true;
         }
 
         if (attrString == KW_LEFT_ASSOC) {
-            funInfo->assocL = true;
+            funEntry->assocL = true;
         }
 
         if (attrString == KW_CHAINABLE) {
-            funInfo->chainable = true;
+            funEntry->chainable = true;
         }
 
         if (attrString == KW_PAIRWISE) {
-            funInfo->pairwise = true;
+            funEntry->pairwise = true;
         }
     }
 
-    return funInfo;
+    return funEntry;
 }
 
-FunInfoPtr SortednessChecker::getInfo(const ParametricFunDeclarationPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const ParametricFunDeclarationPtr& node) {
     std::vector<SortPtr> newsig;
     for (const auto& sort : node->signature) {
         newsig.push_back(ctx->getStack()->expand(sort));
     }
 
-    FunInfoPtr funInfo = make_shared<FunInfo>(std::move(node->identifier->toString()), newsig,
+    FunEntryPtr funEntry = make_shared<FunEntry>(std::move(node->identifier->toString()), newsig,
                                               node->parameters, node->attributes, node);
 
     for (const auto& attr : node->attributes) {
         string attrString = attr->toString();
         if (attrString == KW_RIGHT_ASSOC) {
-            funInfo->assocR = true;
+            funEntry->assocR = true;
         }
 
         if (attrString == KW_LEFT_ASSOC) {
-            funInfo->assocL = true;
+            funEntry->assocL = true;
         }
 
         if (attrString == KW_CHAINABLE) {
-            funInfo->chainable = true;
+            funEntry->chainable = true;
         }
 
         if (attrString == KW_PAIRWISE) {
-            funInfo->pairwise = true;
+            funEntry->pairwise = true;
         }
     }
 
-    return funInfo;
+    return funEntry;
 }
 
-FunInfoPtr SortednessChecker::getInfo(const DeclareConstCommandPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const DeclareConstCommandPtr& node) {
     std::vector<SortPtr> newsig;
     newsig.push_back(ctx->getStack()->expand(node->sort));
 
-    return make_shared<FunInfo>(node->symbol->toString(), newsig, node);
+    return make_shared<FunEntry>(node->symbol->toString(), newsig, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const DeclareFunCommandPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const DeclareFunCommandPtr& node) {
     std::vector<SortPtr> newsig;
     for (const auto& param : node->parameters) {
         SortPtr itsort = ctx->getStack()->expand(param);
@@ -173,21 +172,21 @@ FunInfoPtr SortednessChecker::getInfo(const DeclareFunCommandPtr& node) {
     SortPtr retsort = ctx->getStack()->expand(node->sort);
     newsig.push_back(retsort);
 
-    return make_shared<FunInfo>(node->symbol->toString(), newsig, node);
+    return make_shared<FunEntry>(node->symbol->toString(), newsig, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const DefineFunCommandPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const DefineFunCommandPtr& node) {
     std::vector<SortPtr> newsig;
     for (const auto& param : node->definition->signature->parameters) {
         newsig.push_back(ctx->getStack()->expand(param->sort));
     }
     newsig.push_back(ctx->getStack()->expand(node->definition->signature->sort));
 
-    return make_shared<FunInfo>(node->definition->signature->symbol->toString(),
+    return make_shared<FunEntry>(node->definition->signature->symbol->toString(),
                                 newsig, node->definition->body, node);
 }
 
-FunInfoPtr SortednessChecker::getInfo(const DefineFunRecCommandPtr& node) {
+FunEntryPtr SortednessChecker::getEntry(const DefineFunRecCommandPtr& node) {
     std::vector<SortPtr> newsig;
 
     for (const auto& param : node->definition->signature->parameters) {
@@ -195,12 +194,12 @@ FunInfoPtr SortednessChecker::getInfo(const DefineFunRecCommandPtr& node) {
     }
     newsig.push_back(ctx->getStack()->expand(node->definition->signature->sort));
 
-    return make_shared<FunInfo>(std::move(node->definition->signature->symbol->toString()),
+    return make_shared<FunEntry>(std::move(node->definition->signature->symbol->toString()),
                                 newsig, node->definition->body, node);
 }
 
-std::vector<FunInfoPtr> SortednessChecker::getInfo(const DefineFunsRecCommandPtr& node) {
-    std::vector<FunInfoPtr> infos;
+std::vector<FunEntryPtr> SortednessChecker::getEntry(const DefineFunsRecCommandPtr& node) {
+    std::vector<FunEntryPtr> entries;
     for (size_t i = 0, sz = node->declarations.size(); i < sz; i++) {
         std::vector<SortPtr> newsig;
         for (const auto& param : node->declarations[i]->parameters) {
@@ -208,23 +207,23 @@ std::vector<FunInfoPtr> SortednessChecker::getInfo(const DefineFunsRecCommandPtr
         }
         newsig.push_back(ctx->getStack()->expand(node->declarations[i]->sort));
 
-        infos.push_back(make_shared<FunInfo>(node->declarations[i]->symbol->toString(),
+        entries.push_back(make_shared<FunEntry>(node->declarations[i]->symbol->toString(),
                                              newsig, node->bodies[i], node));
     }
 
-    return infos;
+    return entries;
 }
 
-std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypeCommandPtr& node) {
-    std::vector<SymbolInfoPtr> infos;
+std::vector<SymbolEntryPtr> SortednessChecker::getEntry(const DeclareDatatypeCommandPtr& node) {
+    std::vector<SymbolEntryPtr> entry;
     string typeName = node->symbol->toString();
 
     ParametricDatatypeDeclarationPtr pdecl =
             dynamic_pointer_cast<ParametricDatatypeDeclaration>(node->declaration);
 
     if (pdecl) {
-        // Add datatype (parametric) sort info
-        infos.push_back(make_shared<SortInfo>(typeName, pdecl->parameters.size(), node));
+        // Add datatype (parametric) sort entry
+        entry.push_back(make_shared<SortEntry>(typeName, pdecl->parameters.size(), node));
 
         // Build a sort representing the datatype (to be used in the signatures of the constructors and selectors)
         SortPtr typeSort = make_shared<Sort>(std::move(make_shared<SimpleIdentifier>(node->symbol)));
@@ -237,7 +236,7 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypeComma
         typeSort = ctx->getStack()->expand(typeSort);
 
         for (const auto& cons : pdecl->constructors) {
-            // Start building function info for current constructor
+            // Start building function entry for current constructor
             string consName = cons->symbol->toString();
             std::vector<SortPtr> consSig;
 
@@ -245,24 +244,24 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypeComma
                 // Add sort of current selector to current constructor signature
                 consSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                // Build function info for current selector
+                // Build function entry for current selector
                 string selName = sel->symbol->toString();
                 std::vector<SortPtr> selSig;
                 selSig.push_back(typeSort);
                 selSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                // Add selector function info
-                infos.push_back(make_shared<FunInfo>(selName, selSig, pdecl->parameters, node));
+                // Add selector function entry
+                entry.push_back(make_shared<FunEntry>(selName, selSig, pdecl->parameters, node));
             }
 
-            // Add constructor function info
+            // Add constructor function entry
             consSig.push_back(typeSort);
-            infos.push_back(make_shared<FunInfo>(consName, consSig, pdecl->parameters, node));
+            entry.push_back(make_shared<FunEntry>(consName, consSig, pdecl->parameters, node));
         }
 
     } else {
-        // Add datatype (non-parametric) sort info
-        infos.push_back(make_shared<SortInfo>(typeName, 0, node));
+        // Add datatype (non-parametric) sort entry
+        entry.push_back(make_shared<SortEntry>(typeName, 0, node));
 
         // Build a sort representing the datatype (to be used in the signatures of the constructors and selectors)
         SortPtr typeSort = make_shared<Sort>(make_shared<SimpleIdentifier>(node->symbol));
@@ -272,7 +271,7 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypeComma
                 dynamic_pointer_cast<SimpleDatatypeDeclaration>(node->declaration);
 
         for (const auto& cons : sdecl->constructors) {
-            // Start building function info for current constructor
+            // Start building function entry for current constructor
             string consName = cons->symbol->toString();
             std::vector<SortPtr> consSig;
 
@@ -280,27 +279,27 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypeComma
                 // Add sort of current selector to current constructor signature
                 consSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                // Build function info for current selector
+                // Build function entry for current selector
                 string selName = sel->symbol->toString();
                 std::vector<SortPtr> selSig;
                 selSig.push_back(typeSort);
                 selSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                // Add selector function info
-                infos.push_back(make_shared<FunInfo>(selName, selSig, node));
+                // Add selector function entry
+                entry.push_back(make_shared<FunEntry>(selName, selSig, node));
             }
 
-            // Add constructor function info
+            // Add constructor function entry
             consSig.push_back(typeSort);
-            infos.push_back(make_shared<FunInfo>(consName, consSig, node));
+            entry.push_back(make_shared<FunEntry>(consName, consSig, node));
         }
     }
 
-    return infos;
+    return entry;
 }
 
-std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesCommandPtr& node) {
-    std::vector<SymbolInfoPtr> infos;
+std::vector<SymbolEntryPtr> SortednessChecker::getEntry(const DeclareDatatypesCommandPtr& node) {
+    std::vector<SymbolEntryPtr> entries;
 
     std::vector<SortDeclarationPtr>& datatypeSorts = node->sorts;
     for (const auto& sort : datatypeSorts) {
@@ -308,7 +307,7 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesComm
         size_t arity = (size_t) sort->arity->value;
 
         // Add datatype sort info
-        infos.push_back(make_shared<SortInfo>(typeName, arity, node));
+        entries.push_back(make_shared<SortEntry>(typeName, arity, node));
     }
 
     for (size_t i = 0, sz = node->sorts.size(); i < sz; i++) {
@@ -327,7 +326,7 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesComm
             std::vector<ConstructorDeclarationPtr>& constructors = pdecl->constructors;
 
             for (const auto& cons : constructors) {
-                // Start building function info for current constructor
+                // Start building function entry for current constructor
                 string consName = cons->symbol->toString();
                 std::vector<SortPtr> consSig;
 
@@ -335,19 +334,19 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesComm
                     // Add sort of current selector to current constructor signature
                     consSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                    // Build function info for current selector
+                    // Build function entry for current selector
                     string selName = sel->symbol->toString();
                     std::vector<SortPtr> selSig;
                     selSig.push_back(typeSort);
                     selSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                    // Add selector function info
-                    infos.push_back(make_shared<FunInfo>(selName, selSig, pdecl->parameters, node));
+                    // Add selector function entry
+                    entries.push_back(make_shared<FunEntry>(selName, selSig, pdecl->parameters, node));
                 }
 
-                // Add constructor function info
+                // Add constructor function entry
                 consSig.push_back(typeSort);
-                infos.push_back(make_shared<FunInfo>(consName, consSig, pdecl->parameters, node));
+                entries.push_back(make_shared<FunEntry>(consName, consSig, pdecl->parameters, node));
             }
         } else {
             // Build a sort representing the datatype (to be used in the signatures of the constructors and selectors)
@@ -359,7 +358,7 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesComm
                     dynamic_pointer_cast<SimpleDatatypeDeclaration>(node->declarations[i]);
 
             for (const auto& cons : sdecl->constructors) {
-                // Start building function info for current constructor
+                // Start building function entry for current constructor
                 string consName = cons->symbol->toString();
                 std::vector<SortPtr> consSig;
 
@@ -367,24 +366,24 @@ std::vector<SymbolInfoPtr> SortednessChecker::getInfo(const DeclareDatatypesComm
                     // Add sort of current selector to current constructor signature
                     consSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                    // Build function info for current selector
+                    // Build function entry for current selector
                     string selName = sel->symbol->toString();
                     std::vector<SortPtr> selSig;
                     selSig.push_back(typeSort);
                     selSig.push_back(ctx->getStack()->expand(sel->sort));
 
-                    // Add selector function info
-                    infos.push_back(make_shared<FunInfo>(selName, selSig, node));
+                    // Add selector function entry
+                    entries.push_back(make_shared<FunEntry>(selName, selSig, node));
                 }
 
-                // Add constructor function info
+                // Add constructor function entry
                 consSig.push_back(typeSort);
-                infos.push_back(make_shared<FunInfo>(consName, consSig, node));
+                entries.push_back(make_shared<FunEntry>(consName, consSig, node));
             }
         }
     }
 
-    return infos;
+    return entries;
 }
 
 void SortednessChecker::loadTheory(const string& theory) {
@@ -444,8 +443,8 @@ SortednessChecker::NodeErrorPtr SortednessChecker::checkSort(const SortPtr& sort
                                                              const NodePtr& source,
                                                              SortednessChecker::NodeErrorPtr& err) {
     string name = sort->identifier->toString();
-    SortInfoPtr info = ctx->getStack()->getSortInfo(name);
-    if (!info) {
+    SortEntryPtr entry = ctx->getStack()->getSortEntry(name);
+    if (!entry) {
         err = addError(ErrorMessages::buildSortUnknown(name, sort->rowLeft, sort->colLeft,
                                                        sort->rowRight, sort->colRight), source, err);
 
@@ -453,11 +452,11 @@ SortednessChecker::NodeErrorPtr SortednessChecker::checkSort(const SortPtr& sort
             checkSort(arg, source, err);
         }
     } else {
-        if (sort->arguments.size() != info->arity) {
-            err = addError(ErrorMessages::buildSortArity(name, info->arity, sort->arguments.size(),
+        if (sort->arguments.size() != entry->arity) {
+            err = addError(ErrorMessages::buildSortArity(name, entry->arity, sort->arguments.size(),
                                                          sort->rowLeft, sort->colLeft,
                                                          sort->rowRight, sort->colRight),
-                           source, info, err);
+                           source, entry, err);
         } else {
             for (const auto& arg : sort->arguments) {
                 checkSort(arg, source, err);
@@ -479,8 +478,8 @@ SortednessChecker::NodeErrorPtr SortednessChecker::checkSort(const std::vector<S
     }
 
     if (!isParam) {
-        SortInfoPtr info = ctx->getStack()->getSortInfo(name);
-        if (!info) {
+        SortEntryPtr entry = ctx->getStack()->getSortEntry(name);
+        if (!entry) {
             err = addError(ErrorMessages::buildSortUnknown(name, sort->rowLeft, sort->colLeft,
                                                            sort->rowRight, sort->colRight), source, err);
             for (const auto& arg : sort->arguments) {
@@ -490,11 +489,11 @@ SortednessChecker::NodeErrorPtr SortednessChecker::checkSort(const std::vector<S
             if (sort->arguments.empty())
                 return err;
 
-            if (sort->arguments.size() != info->arity) {
-                err = addError(ErrorMessages::buildSortArity(name, info->arity, sort->arguments.size(),
+            if (sort->arguments.size() != entry->arity) {
+                err = addError(ErrorMessages::buildSortArity(name, entry->arity, sort->arguments.size(),
                                                              sort->rowLeft, sort->colLeft,
                                                              sort->rowRight, sort->colRight),
-                               source, info, err);
+                               source, entry, err);
             } else {
                 for (const auto& arg : sort->arguments) {
                     checkSort(params, arg, source, err);
@@ -529,11 +528,11 @@ void SortednessChecker::visit(const DeclareConstCommandPtr& node) {
     NodeErrorPtr err;
     err = checkSort(node->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    FunInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    FunEntryPtr nodeEntry = getEntry(node);
+    FunEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildConstAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildConstAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -545,11 +544,11 @@ void SortednessChecker::visit(const DeclareFunCommandPtr& node) {
 
     err = checkSort(node->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    FunInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    FunEntryPtr nodeEntry = getEntry(node);
+    FunEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildFunAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildFunAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -559,14 +558,14 @@ void SortednessChecker::visit(const DeclareDatatypeCommandPtr& node) {
     ParametricDatatypeDeclarationPtr pdecl =
             dynamic_pointer_cast<ParametricDatatypeDeclaration>(node->declaration);
 
-    std::vector<SymbolInfoPtr> infos = getInfo(node);
-    for (const auto& info : infos) {
-        SortInfoPtr sortInfo = dynamic_pointer_cast<SortInfo>(info);
-        if (sortInfo) {
-            SortInfoPtr dupInfo = ctx->getStack()->tryAdd(sortInfo);
+    std::vector<SymbolEntryPtr> entries = getEntry(node);
+    for (const auto& entry : entries) {
+        SortEntryPtr sortEntry = dynamic_pointer_cast<SortEntry>(entry);
+        if (sortEntry) {
+            SortEntryPtr dupEntry = ctx->getStack()->tryAdd(sortEntry);
 
-            if (dupInfo) {
-                err = addError(ErrorMessages::buildSortAlreadyExists(sortInfo->name), node, dupInfo, err);
+            if (dupEntry) {
+                err = addError(ErrorMessages::buildSortAlreadyExists(sortEntry->name), node, dupEntry, err);
             }
         }
     }
@@ -588,14 +587,14 @@ void SortednessChecker::visit(const DeclareDatatypeCommandPtr& node) {
         }
     }
 
-    infos = getInfo(node);
-    for (const auto& info : infos) {
-        FunInfoPtr funInfo = dynamic_pointer_cast<FunInfo>(info);
-        if (funInfo) {
-            FunInfoPtr dupInfo = ctx->getStack()->tryAdd(funInfo);
+    entries = getEntry(node);
+    for (const auto& entry : entries) {
+        FunEntryPtr funEntry = dynamic_pointer_cast<FunEntry>(entry);
+        if (funEntry) {
+            FunEntryPtr dupEntry = ctx->getStack()->tryAdd(funEntry);
 
-            if (dupInfo) {
-                err = addError(ErrorMessages::buildFunAlreadyExists(funInfo->name), node, dupInfo, err);
+            if (dupEntry) {
+                err = addError(ErrorMessages::buildFunAlreadyExists(funEntry->name), node, dupEntry, err);
             }
 
         }
@@ -605,13 +604,13 @@ void SortednessChecker::visit(const DeclareDatatypeCommandPtr& node) {
 void SortednessChecker::visit(const DeclareDatatypesCommandPtr& node) {
     NodeErrorPtr err;
 
-    std::vector<SymbolInfoPtr> infos = getInfo(node);
-    for (const auto& info : infos) {
-        SortInfoPtr sortInfo = dynamic_pointer_cast<SortInfo>(info);
-        if (sortInfo) {
-            SortInfoPtr dupInfo = ctx->getStack()->tryAdd(sortInfo);
-            if (dupInfo) {
-                err = addError(ErrorMessages::buildSortAlreadyExists(sortInfo->name), node, dupInfo, err);
+    std::vector<SymbolEntryPtr> entries = getEntry(node);
+    for (const auto& entry : entries) {
+        SortEntryPtr sortEntry = dynamic_pointer_cast<SortEntry>(entry);
+        if (sortEntry) {
+            SortEntryPtr dupEntry = ctx->getStack()->tryAdd(sortEntry);
+            if (dupEntry) {
+                err = addError(ErrorMessages::buildSortAlreadyExists(sortEntry->name), node, dupEntry, err);
             }
         }
     }
@@ -640,25 +639,25 @@ void SortednessChecker::visit(const DeclareDatatypesCommandPtr& node) {
         }
     }
 
-    infos = getInfo(node);
-    for (const auto& info : infos) {
-        FunInfoPtr funInfo = dynamic_pointer_cast<FunInfo>(info);
+    entries = getEntry(node);
+    for (const auto& entry : entries) {
+        FunEntryPtr funEntry = dynamic_pointer_cast<FunEntry>(entry);
 
-        if (funInfo) {
-            FunInfoPtr dupInfo = ctx->getStack()->tryAdd(funInfo);
-            if (dupInfo) {
-                err = addError(ErrorMessages::buildFunAlreadyExists(funInfo->name), node, dupInfo, err);
+        if (funEntry) {
+            FunEntryPtr dupEntry = ctx->getStack()->tryAdd(funEntry);
+            if (dupEntry) {
+                err = addError(ErrorMessages::buildFunAlreadyExists(funEntry->name), node, dupEntry, err);
             }
         }
     }
 }
 
 void SortednessChecker::visit(const DeclareSortCommandPtr& node) {
-    SortInfoPtr nodeInfo = getInfo(node);
-    SortInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    SortEntryPtr nodeEntry = getEntry(node);
+    SortEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildSortAlreadyExists(nodeInfo->name), node, dupInfo);
+    if (dupEntry) {
+        addError(ErrorMessages::buildSortAlreadyExists(nodeEntry->name), node, dupEntry);
     }
 }
 
@@ -679,16 +678,16 @@ void SortednessChecker::visit(const DefineFunCommandPtr& node) {
     }
     err = checkSort(node->definition->signature->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    FunInfoPtr dupInfo = ctx->getStack()->findDuplicate(nodeInfo);
+    FunEntryPtr nodeEntry = getEntry(node);
+    FunEntryPtr dupEntry = ctx->getStack()->findDuplicate(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildFunAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildFunAlreadyExists(nodeEntry->name), node, dupEntry, err);
     } else {
         ctx->getStack()->push();
 
         for (const auto& bind : node->definition->signature->parameters) {
-            ctx->getStack()->tryAdd(make_shared<VarInfo>(bind->symbol->toString(),
+            ctx->getStack()->tryAdd(make_shared<VarEntry>(bind->symbol->toString(),
                                                          ctx->getStack()->expand(bind->sort), node));
         }
 
@@ -696,7 +695,7 @@ void SortednessChecker::visit(const DefineFunCommandPtr& node) {
         SortPtr result = sorter.run(node->definition->body);
 
         if (result) {
-            string retstr = nodeInfo->signature[nodeInfo->signature.size() - 1]->toString();
+            string retstr = nodeEntry->signature[nodeEntry->signature.size() - 1]->toString();
             string resstr = result->toString();
             if (resstr != retstr) {
                 TermPtr body = node->definition->body;
@@ -712,7 +711,7 @@ void SortednessChecker::visit(const DefineFunCommandPtr& node) {
         }
 
         ctx->getStack()->pop();
-        ctx->getStack()->tryAdd(nodeInfo);
+        ctx->getStack()->tryAdd(nodeEntry);
     }
 }
 
@@ -724,17 +723,17 @@ void SortednessChecker::visit(const DefineFunRecCommandPtr& node) {
     }
     err = checkSort(node->definition->signature->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    FunInfoPtr dupInfo = ctx->getStack()->findDuplicate(nodeInfo);
+    FunEntryPtr nodeEntry = getEntry(node);
+    FunEntryPtr dupEntry = ctx->getStack()->findDuplicate(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildFunAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildFunAlreadyExists(nodeEntry->name), node, dupEntry, err);
     } else {
         ctx->getStack()->push();
-        ctx->getStack()->tryAdd(nodeInfo);
+        ctx->getStack()->tryAdd(nodeEntry);
 
         for (const auto& bind : node->definition->signature->parameters) {
-            ctx->getStack()->tryAdd(make_shared<VarInfo>(bind->symbol->toString(),
+            ctx->getStack()->tryAdd(make_shared<VarEntry>(bind->symbol->toString(),
                                                          ctx->getStack()->expand(bind->sort), node));
         }
 
@@ -742,7 +741,7 @@ void SortednessChecker::visit(const DefineFunRecCommandPtr& node) {
         SortPtr result = sorter.run(node->definition->body);
 
         if (result) {
-            string retstr = nodeInfo->signature[nodeInfo->signature.size() - 1]->toString();
+            string retstr = nodeEntry->signature[nodeEntry->signature.size() - 1]->toString();
             string resstr = result->toString();
             if (resstr != retstr) {
                 TermPtr body = node->definition->body;
@@ -758,7 +757,7 @@ void SortednessChecker::visit(const DefineFunRecCommandPtr& node) {
         }
 
         ctx->getStack()->pop();
-        ctx->getStack()->tryAdd(nodeInfo);
+        ctx->getStack()->tryAdd(nodeEntry);
     }
 }
 
@@ -773,14 +772,14 @@ void SortednessChecker::visit(const DefineFunsRecCommandPtr& node) {
         err = checkSort(decl->sort, node, err);
     }
 
-    std::vector<FunInfoPtr> infos = getInfo(node);
+    std::vector<FunEntryPtr> entries = getEntry(node);
 
     bool dup = false;
-    for (const auto& info : infos) {
-        FunInfoPtr dupInfo = ctx->getStack()->findDuplicate(info);
-        if (dupInfo) {
+    for (const auto& entry : entries) {
+        FunEntryPtr dupEntry = ctx->getStack()->findDuplicate(entry);
+        if (dupEntry) {
             dup = true;
-            err = addError(ErrorMessages::buildFunAlreadyExists(info->name), node, info, err);
+            err = addError(ErrorMessages::buildFunAlreadyExists(entry->name), node, entry, err);
         }
     }
 
@@ -788,14 +787,14 @@ void SortednessChecker::visit(const DefineFunsRecCommandPtr& node) {
         ctx->getStack()->push();
 
         for (size_t i = 0, sz = node->declarations.size(); i < sz; i++) {
-            ctx->getStack()->tryAdd(infos[i]);
+            ctx->getStack()->tryAdd(entries[i]);
         }
 
         for (size_t i = 0, sz = node->declarations.size(); i < sz; i++) {
             ctx->getStack()->push();
             std::vector<SortedVariablePtr>& bindings = node->declarations[i]->parameters;
             for (const auto& bind : bindings) {
-                ctx->getStack()->tryAdd(make_shared<VarInfo>(bind->symbol->toString(),
+                ctx->getStack()->tryAdd(make_shared<VarEntry>(bind->symbol->toString(),
                                                              ctx->getStack()->expand(bind->sort), node));
             }
 
@@ -803,28 +802,28 @@ void SortednessChecker::visit(const DefineFunsRecCommandPtr& node) {
             SortPtr result = sorter.run(node->bodies[i]);
 
             if (result) {
-                string retstr = infos[i]->signature[infos[i]->signature.size() - 1]->toString();
+                string retstr = entries[i]->signature[entries[i]->signature.size() - 1]->toString();
                 string resstr = result->toString();
                 if (resstr != retstr) {
-                    err = addError(ErrorMessages::buildFunBodyWrongSort(infos[i]->name, infos[i]->body->toString(),
-                                                                        resstr, retstr, infos[i]->body->rowLeft,
-                                                                        infos[i]->body->colLeft,
-                                                                        infos[i]->body->rowRight,
-                                                                        infos[i]->body->colRight), node, err);
+                    err = addError(ErrorMessages::buildFunBodyWrongSort(entries[i]->name, entries[i]->body->toString(),
+                                                                        resstr, retstr, entries[i]->body->rowLeft,
+                                                                        entries[i]->body->colLeft,
+                                                                        entries[i]->body->rowRight,
+                                                                        entries[i]->body->colRight), node, err);
                 }
             } else {
-                err = addError(ErrorMessages::buildFunBodyNotWellSorted(infos[i]->name, infos[i]->body->toString(),
-                                                                        infos[i]->body->rowLeft,
-                                                                        infos[i]->body->colLeft,
-                                                                        infos[i]->body->rowRight,
-                                                                        infos[i]->body->colRight), node, err);
+                err = addError(ErrorMessages::buildFunBodyNotWellSorted(entries[i]->name, entries[i]->body->toString(),
+                                                                        entries[i]->body->rowLeft,
+                                                                        entries[i]->body->colLeft,
+                                                                        entries[i]->body->rowRight,
+                                                                        entries[i]->body->colRight), node, err);
             }
             ctx->getStack()->pop();
         }
 
         ctx->getStack()->pop();
-        for (const auto& info : infos) {
-            ctx->getStack()->tryAdd(info);
+        for (const auto& entry : entries) {
+            ctx->getStack()->tryAdd(entry);
         }
     }
 }
@@ -833,11 +832,11 @@ void SortednessChecker::visit(const DefineSortCommandPtr& node) {
     NodeErrorPtr err;
     err = checkSort(node->parameters, node->sort, node, err);
 
-    SortInfoPtr nodeInfo = getInfo(node);
-    SortInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    SortEntryPtr nodeEntry = getEntry(node);
+    SortEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildSortAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildSortAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -923,11 +922,11 @@ void SortednessChecker::visit(const ScriptPtr& node) {
 }
 
 void SortednessChecker::visit(const SortSymbolDeclarationPtr& node) {
-    SortInfoPtr nodeInfo = getInfo(node);
-    SortInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    SortEntryPtr nodeEntry = getEntry(node);
+    SortEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildSortAlreadyExists(nodeInfo->name), node, dupInfo);
+    if (dupEntry) {
+        addError(ErrorMessages::buildSortAlreadyExists(nodeEntry->name), node, dupEntry);
     }
 }
 
@@ -935,11 +934,11 @@ void SortednessChecker::visit(const SpecConstFunDeclarationPtr& node) {
     NodeErrorPtr err;
     err = checkSort(node->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    FunInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    FunEntryPtr nodeEntry = getEntry(node);
+    FunEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildSpecConstAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildSpecConstAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -947,13 +946,13 @@ void SortednessChecker::visit(const MetaSpecConstFunDeclarationPtr& node) {
     NodeErrorPtr err;
     err = checkSort(node->sort, node, err);
 
-    FunInfoPtr nodeInfo = getInfo(node);
-    std::vector<FunInfoPtr> dupInfo = ctx->getStack()->getFunInfo(nodeInfo->name);
+    FunEntryPtr nodeEntry = getEntry(node);
+    std::vector<FunEntryPtr> dupEntry = ctx->getStack()->getFunEntry(nodeEntry->name);
 
-    if (!dupInfo.empty()) {
-        err = addError(ErrorMessages::buildMetaSpecConstAlreadyExists(nodeInfo->name), node, dupInfo[0], err);
+    if (!dupEntry.empty()) {
+        err = addError(ErrorMessages::buildMetaSpecConstAlreadyExists(nodeEntry->name), node, dupEntry[0], err);
     } else {
-        ctx->getStack()->tryAdd(nodeInfo);
+        ctx->getStack()->tryAdd(nodeEntry);
     }
 }
 
@@ -964,86 +963,86 @@ void SortednessChecker::visit(const SimpleFunDeclarationPtr& node) {
         err = checkSort(sort, node, err);
     }
 
-    FunInfoPtr nodeInfo = getInfo(node);
+    FunEntryPtr nodeEntry = getEntry(node);
 
-    if (nodeInfo->assocL) {
+    if (nodeEntry->assocL) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildLeftAssocParamCount(nodeInfo->name), node, err);
-            nodeInfo->assocL = false;
+            err = addError(ErrorMessages::buildLeftAssocParamCount(nodeEntry->name), node, err);
+            nodeEntry->assocL = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != returnSort->toString()) {
-                err = addError(ErrorMessages::buildLeftAssocRetSort(nodeInfo->name), node, err);
-                nodeInfo->assocL = false;
+                err = addError(ErrorMessages::buildLeftAssocRetSort(nodeEntry->name), node, err);
+                nodeEntry->assocL = false;
             }
         }
     }
 
-    if (nodeInfo->assocR) {
+    if (nodeEntry->assocR) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildRightAssocParamCount(nodeInfo->name), node, err);
-            nodeInfo->assocR = false;
+            err = addError(ErrorMessages::buildRightAssocParamCount(nodeEntry->name), node, err);
+            nodeEntry->assocR = false;
         } else {
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (secondSort->toString() != returnSort->toString()) {
-                err = addError(ErrorMessages::buildRightAssocRetSort(nodeInfo->name), node, err);
-                nodeInfo->assocR = false;
+                err = addError(ErrorMessages::buildRightAssocRetSort(nodeEntry->name), node, err);
+                nodeEntry->assocR = false;
             }
         }
     }
 
-    if (nodeInfo->chainable && nodeInfo->pairwise) {
-        err = addError(ErrorMessages::buildChainableAndPairwise(nodeInfo->name), node, err);
-        nodeInfo->chainable = false;
-        nodeInfo->pairwise = false;
-    } else if (nodeInfo->chainable) {
+    if (nodeEntry->chainable && nodeEntry->pairwise) {
+        err = addError(ErrorMessages::buildChainableAndPairwise(nodeEntry->name), node, err);
+        nodeEntry->chainable = false;
+        nodeEntry->pairwise = false;
+    } else if (nodeEntry->chainable) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildChainableParamCount(nodeInfo->name), node, err);
-            nodeInfo->chainable = false;
+            err = addError(ErrorMessages::buildChainableParamCount(nodeEntry->name), node, err);
+            nodeEntry->chainable = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != secondSort->toString()) {
-                err = addError(ErrorMessages::buildChainableParamSort(nodeInfo->name), node, err);
-                nodeInfo->chainable = false;
+                err = addError(ErrorMessages::buildChainableParamSort(nodeEntry->name), node, err);
+                nodeEntry->chainable = false;
             }
 
             if (returnSort->toString() != SORT_BOOL) {
-                err = addError(ErrorMessages::buildChainableRetSort(nodeInfo->name), node, err);
-                nodeInfo->chainable = false;
+                err = addError(ErrorMessages::buildChainableRetSort(nodeEntry->name), node, err);
+                nodeEntry->chainable = false;
             }
         }
-    } else if (nodeInfo->pairwise) {
+    } else if (nodeEntry->pairwise) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildPairwiseParamCount(nodeInfo->name), node, err);
-            nodeInfo->pairwise = false;
+            err = addError(ErrorMessages::buildPairwiseParamCount(nodeEntry->name), node, err);
+            nodeEntry->pairwise = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != secondSort->toString()) {
-                err = addError(ErrorMessages::buildPairwiseParamSort(nodeInfo->name), node, err);
-                nodeInfo->pairwise = false;
+                err = addError(ErrorMessages::buildPairwiseParamSort(nodeEntry->name), node, err);
+                nodeEntry->pairwise = false;
             }
 
             if (returnSort->toString() != SORT_BOOL) {
-                err = addError(ErrorMessages::buildPairwiseRetSort(nodeInfo->name), node, err);
-                nodeInfo->pairwise = false;
+                err = addError(ErrorMessages::buildPairwiseRetSort(nodeEntry->name), node, err);
+                nodeEntry->pairwise = false;
             }
         }
     }
 
-    FunInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    FunEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildFunAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildFunAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -1054,86 +1053,86 @@ void SortednessChecker::visit(const ParametricFunDeclarationPtr& node) {
         err = checkSort(node->parameters, sort, node, err);
     }
 
-    FunInfoPtr nodeInfo = getInfo(node);
+    FunEntryPtr nodeEntry = getEntry(node);
 
-    if (nodeInfo->assocL) {
+    if (nodeEntry->assocL) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildLeftAssocParamCount(nodeInfo->name), node, err);
-            nodeInfo->assocL = false;
+            err = addError(ErrorMessages::buildLeftAssocParamCount(nodeEntry->name), node, err);
+            nodeEntry->assocL = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != returnSort->toString()) {
-                err = addError(ErrorMessages::buildLeftAssocRetSort(nodeInfo->name), node, err);
-                nodeInfo->assocL = false;
+                err = addError(ErrorMessages::buildLeftAssocRetSort(nodeEntry->name), node, err);
+                nodeEntry->assocL = false;
             }
         }
     }
 
-    if (nodeInfo->assocR) {
+    if (nodeEntry->assocR) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildRightAssocParamCount(nodeInfo->name), node, err);
-            nodeInfo->assocR = false;
+            err = addError(ErrorMessages::buildRightAssocParamCount(nodeEntry->name), node, err);
+            nodeEntry->assocR = false;
         } else {
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (secondSort->toString() != returnSort->toString()) {
-                err = addError(ErrorMessages::buildRightAssocRetSort(nodeInfo->name), node, err);
-                nodeInfo->assocR = false;
+                err = addError(ErrorMessages::buildRightAssocRetSort(nodeEntry->name), node, err);
+                nodeEntry->assocR = false;
             }
         }
     }
 
-    if (nodeInfo->chainable && nodeInfo->pairwise) {
-        err = addError(ErrorMessages::buildChainableAndPairwise(nodeInfo->name), node, err);
-        nodeInfo->chainable = false;
-        nodeInfo->pairwise = false;
-    } else if (nodeInfo->chainable) {
+    if (nodeEntry->chainable && nodeEntry->pairwise) {
+        err = addError(ErrorMessages::buildChainableAndPairwise(nodeEntry->name), node, err);
+        nodeEntry->chainable = false;
+        nodeEntry->pairwise = false;
+    } else if (nodeEntry->chainable) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildChainableParamCount(nodeInfo->name), node, err);
-            nodeInfo->chainable = false;
+            err = addError(ErrorMessages::buildChainableParamCount(nodeEntry->name), node, err);
+            nodeEntry->chainable = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != secondSort->toString()) {
-                err = addError(ErrorMessages::buildChainableParamSort(nodeInfo->name), node, err);
-                nodeInfo->chainable = false;
+                err = addError(ErrorMessages::buildChainableParamSort(nodeEntry->name), node, err);
+                nodeEntry->chainable = false;
             }
 
             if (returnSort->toString() != SORT_BOOL) {
-                err = addError(ErrorMessages::buildChainableRetSort(nodeInfo->name), node, err);
-                nodeInfo->chainable = false;
+                err = addError(ErrorMessages::buildChainableRetSort(nodeEntry->name), node, err);
+                nodeEntry->chainable = false;
             }
         }
-    } else if (nodeInfo->pairwise) {
+    } else if (nodeEntry->pairwise) {
         if (node->signature.size() != 3) {
-            err = addError(ErrorMessages::buildPairwiseParamCount(nodeInfo->name), node, err);
-            nodeInfo->pairwise = false;
+            err = addError(ErrorMessages::buildPairwiseParamCount(nodeEntry->name), node, err);
+            nodeEntry->pairwise = false;
         } else {
             SortPtr firstSort = node->signature[0];
             SortPtr secondSort = node->signature[1];
             SortPtr returnSort = node->signature[2];
 
             if (firstSort->toString() != secondSort->toString()) {
-                err = addError(ErrorMessages::buildPairwiseParamSort(nodeInfo->name), node, err);
-                nodeInfo->pairwise = false;
+                err = addError(ErrorMessages::buildPairwiseParamSort(nodeEntry->name), node, err);
+                nodeEntry->pairwise = false;
             }
 
             if (returnSort->toString() != SORT_BOOL) {
-                err = addError(ErrorMessages::buildPairwiseRetSort(nodeInfo->name), node, err);
-                nodeInfo->pairwise = false;
+                err = addError(ErrorMessages::buildPairwiseRetSort(nodeEntry->name), node, err);
+                nodeEntry->pairwise = false;
             }
         }
     }
 
-    FunInfoPtr dupInfo = ctx->getStack()->tryAdd(nodeInfo);
+    FunEntryPtr dupEntry = ctx->getStack()->tryAdd(nodeEntry);
 
-    if (dupInfo) {
-        addError(ErrorMessages::buildFunAlreadyExists(nodeInfo->name), node, dupInfo, err);
+    if (dupEntry) {
+        addError(ErrorMessages::buildFunAlreadyExists(nodeEntry->name), node, dupEntry, err);
     }
 }
 
@@ -1141,7 +1140,7 @@ bool SortednessChecker::check(NodePtr& node) {
     if (node) {
         visit0(node);
     } else {
-        Logger::warning("SortednessChecker::run()", "Attempting to check an empty abstract syntax tree");
+        Logger::warning("SortednessChecker::run()", "Attempting to check an empty smtlib::ast node");
         return false;
     }
     return errors.empty();
@@ -1180,8 +1179,8 @@ string SortednessChecker::getErrors() {
             for (size_t i = 0, sz = err->errs.size(); i < sz; i++) {
                 NodePtr source;
 
-                if (err->errs[i]->info) {
-                    source = err->errs[i]->info->source;
+                if (err->errs[i]->entry) {
+                    source = err->errs[i]->entry->source;
                 }
 
                 if (i != 0 && source)

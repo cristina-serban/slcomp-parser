@@ -6,8 +6,8 @@
 #ifndef SLCOMP_PARSER_ERROR_MESSAGES_H
 #define SLCOMP_PARSER_ERROR_MESSAGES_H
 
-#include "ast/ast_abstract.h"
-#include "ast/ast_sort.h"
+#include "ast/ast_classes.h"
+#include "sep/sep_classes.h"
 
 #include <sstream>
 #include <string>
@@ -136,6 +136,10 @@ public:
     static const std::string ERR_UFLD_LVL_NEGATIVE;
     static const std::string ERR_UFLD_LVL_INVALID;
     static const std::string ERR_OUT_PATH_INVALID;
+    static const std::string ERR_UNSPECIFIED_LOC_SORT;
+    static const std::string ERR_UNSPECIFIED_DATA_SORT;
+    static const std::string ERR_UNSPECIFIED_NIL_SORT;
+    static const std::string ERR_PTO_LEFT_NIL;
 
     static std::string buildTheoryUnloadable(const std::string& theory);
 
@@ -301,6 +305,13 @@ public:
 
     static std::string buildDefFunsRecCount(size_t declCount,
                                             size_t bodyCount);
+
+    static std::string buildLocDataPairUnaccepted(smtlib::sep::SortPtr loc,
+                                                  smtlib::sep::SortPtr data,
+                                                  const std::vector<std::string>& acceptedPairs);
+
+    static std::string buildLocSortUnaccepted(smtlib::sep::SortPtr loc,
+                                              const std::vector<std::string>& acceptedLoc);
 };
 
 typedef std::shared_ptr<ErrorMessages> ErrorMessagesPtr;

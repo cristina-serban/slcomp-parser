@@ -20,7 +20,7 @@ string SimpleIdentifier::toString() {
         return symbol->toString();
 
     stringstream ss;
-    ss << "( _ " << symbol->toString() << " ";
+    ss << "(_ " << symbol->toString() << " ";
 
     for (size_t i = 0, sz = indices.size(); i < sz; i++) {
         if (i != 0)

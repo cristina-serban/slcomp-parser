@@ -1,9 +1,12 @@
 #include "execution.h"
 
 #include "ast/ast_script.h"
+#include "sep/sep_script.h"
+#include "transl/sep_translator.h"
 #include "util/global_values.h"
 #include "visitor/ast_syntax_checker.h"
 #include "visitor/ast_sortedness_checker.h"
+#include "visitor/sep_heap_checker.h"
 
 #include <iostream>
 
@@ -121,4 +124,31 @@ bool Execution::checkSortedness() {
     }
 
     return sortednessCheckSuccessful;
+}
+
+bool Execution::checkHeap() {
+    if (heapCheckAttempted)
+        return heapCheckSuccessful;
+
+    heapCheckAttempted = true;
+
+    if (!checkSortedness()) {
+        //Logger::error("SmtExecution::checkHeap()", "Stopped due to previous errors");
+        return false;
+    }
+
+    ast::ScriptPtr astScript = dynamic_pointer_cast<Script>(ast);
+    if (astScript) {
+        sep::TranslatorPtr transl = make_shared<sep::Translator>();
+        sep::ScriptPtr sepScript = transl->translate(astScript);
+
+        sep::HeapCheckerPtr checker = make_shared<sep::HeapChecker>();
+        heapCheckSuccessful = checker->check(sepScript);
+
+        if(!heapCheckSuccessful) {
+            Logger::heapError("SmtExecution::checkHeap()", checker->getErrors().c_str());
+        }
+    }
+
+    return heapCheckSuccessful;
 }

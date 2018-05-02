@@ -30,7 +30,7 @@ namespace smtlib {
 
             SymbolTablePtr getTopLevel();
 
-            std::vector<SymbolTablePtr>& getStack();
+            std::vector<SymbolTablePtr>& getLevels();
 
             bool push();
             bool push(size_t levels);
@@ -40,22 +40,22 @@ namespace smtlib {
 
             void reset();
 
-            SortInfoPtr getSortInfo(const std::string& name);
-            std::vector<FunInfoPtr> getFunInfo(const std::string& name);
-            VarInfoPtr getVarInfo(const std::string& name);
+            SortEntryPtr getSortEntry(const std::string& name);
+            std::vector<FunEntryPtr> getFunEntry(const std::string& name);
+            VarEntryPtr getVarEntry(const std::string& name);
 
-            SortInfoPtr findDuplicate(const SortInfoPtr& info);
-            FunInfoPtr findDuplicate(const FunInfoPtr& info);
-            VarInfoPtr findDuplicate(const VarInfoPtr& info);
+            SortEntryPtr findDuplicate(const SortEntryPtr& entry);
+            FunEntryPtr findDuplicate(const FunEntryPtr& entry);
+            VarEntryPtr findDuplicate(const VarEntryPtr& entry);
 
             ast::SortPtr expand(const ast::SortPtr& sort);
 
             ast::SortPtr replace(const ast::SortPtr&,
                                  std::unordered_map<std::string, ast::SortPtr>& mapping);
 
-            SortInfoPtr tryAdd(const SortInfoPtr& info);
-            FunInfoPtr tryAdd(const FunInfoPtr& info);
-            VarInfoPtr tryAdd(const VarInfoPtr& info);
+            SortEntryPtr tryAdd(const SortEntryPtr& entry);
+            FunEntryPtr tryAdd(const FunEntryPtr& entry);
+            VarEntryPtr tryAdd(const VarEntryPtr& entry);
         };
 
         typedef std::shared_ptr<SymbolStack> SymbolStackPtr;

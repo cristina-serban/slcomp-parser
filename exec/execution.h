@@ -23,6 +23,7 @@ namespace slcompparser {
         bool parseAttempted, parseSuccessful;
         bool syntaxCheckAttempted, syntaxCheckSuccessful;
         bool sortednessCheckAttempted, sortednessCheckSuccessful;
+        bool heapCheckAttempted, heapCheckSuccessful;
 
     public:
         /** Execution instance with default settings */
@@ -39,6 +40,8 @@ namespace slcompparser {
 
         /** Check the sortedness of an input file */
         bool checkSortedness();
+
+        bool checkHeap();
     };
 
     typedef std::shared_ptr<Execution> ExecutionPtr;

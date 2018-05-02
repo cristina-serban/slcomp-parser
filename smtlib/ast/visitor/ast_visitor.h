@@ -14,6 +14,8 @@
 
 namespace smtlib {
     namespace ast {
+        /* ===================================== Visitor0 ===================================== */
+        /** A visitor for the smtlib::ast hierarchy */
         class Visitor0 {
         protected:
             virtual void visit0(const NodePtr& node);
@@ -119,6 +121,8 @@ namespace smtlib {
             virtual void visit(const VariableBindingPtr& node) = 0;
         };
 
+        /* =================================== DummyVisitor0 ================================== */
+        /** A dummy (empty) implementation of Visitor0 */
         class DummyVisitor0 : public virtual Visitor0 {
         public:
             void visit(const AttributePtr& node) override;

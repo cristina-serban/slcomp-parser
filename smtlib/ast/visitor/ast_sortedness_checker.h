@@ -62,14 +62,14 @@ namespace smtlib {
         public:
             struct Error {
                 std::string message;
-                SymbolInfoPtr info;
+                SymbolEntryPtr entry;
 
                 inline explicit Error(std::string message)
                         : message(std::move(message)) {}
 
-                inline Error(std::string message, SymbolInfoPtr info)
+                inline Error(std::string message, SymbolEntryPtr entry)
                         : message(std::move(message))
-                        , info(std::move(info)) {}
+                        , entry(std::move(entry)) {}
             };
 
             typedef std::shared_ptr<Error> ErrorPtr;
@@ -96,22 +96,22 @@ namespace smtlib {
             ISortCheckContextPtr ctx;
             std::map<std::string, std::vector<NodeErrorPtr>> errors;
 
-            SortInfoPtr getInfo(const SortSymbolDeclarationPtr& node);
-            SortInfoPtr getInfo(const DeclareSortCommandPtr& node);
-            SortInfoPtr getInfo(const DefineSortCommandPtr& node);
+            SortEntryPtr getEntry(const SortSymbolDeclarationPtr& node);
+            SortEntryPtr getEntry(const DeclareSortCommandPtr& node);
+            SortEntryPtr getEntry(const DefineSortCommandPtr& node);
 
-            FunInfoPtr getInfo(const SpecConstFunDeclarationPtr& node);
-            FunInfoPtr getInfo(const MetaSpecConstFunDeclarationPtr& node);
-            FunInfoPtr getInfo(const SimpleFunDeclarationPtr& node);
-            FunInfoPtr getInfo(const ParametricFunDeclarationPtr& node);
-            FunInfoPtr getInfo(const DeclareConstCommandPtr& node);
-            FunInfoPtr getInfo(const DeclareFunCommandPtr& node);
-            FunInfoPtr getInfo(const DefineFunCommandPtr& node);
-            FunInfoPtr getInfo(const DefineFunRecCommandPtr& node);
+            FunEntryPtr getEntry(const SpecConstFunDeclarationPtr& node);
+            FunEntryPtr getEntry(const MetaSpecConstFunDeclarationPtr& node);
+            FunEntryPtr getEntry(const SimpleFunDeclarationPtr& node);
+            FunEntryPtr getEntry(const ParametricFunDeclarationPtr& node);
+            FunEntryPtr getEntry(const DeclareConstCommandPtr& node);
+            FunEntryPtr getEntry(const DeclareFunCommandPtr& node);
+            FunEntryPtr getEntry(const DefineFunCommandPtr& node);
+            FunEntryPtr getEntry(const DefineFunRecCommandPtr& node);
 
-            std::vector<FunInfoPtr> getInfo(const DefineFunsRecCommandPtr& node);
-            std::vector<SymbolInfoPtr> getInfo(const DeclareDatatypeCommandPtr& node);
-            std::vector<SymbolInfoPtr> getInfo(const DeclareDatatypesCommandPtr& node);
+            std::vector<FunEntryPtr> getEntry(const DefineFunsRecCommandPtr& node);
+            std::vector<SymbolEntryPtr> getEntry(const DeclareDatatypeCommandPtr& node);
+            std::vector<SymbolEntryPtr> getEntry(const DeclareDatatypesCommandPtr& node);
 
             void loadTheory(const std::string& theory,
                             const NodePtr& node,
@@ -134,7 +134,7 @@ namespace smtlib {
 
             NodeErrorPtr addError(const std::string& message,
                                   const NodePtr& node,
-                                  const SymbolInfoPtr& info,
+                                  const SymbolEntryPtr& entry,
                                   NodeErrorPtr& err);
 
             void addError(const std::string& message,
@@ -142,7 +142,7 @@ namespace smtlib {
 
             void addError(const std::string& message,
                           const NodePtr& node,
-                          const SymbolInfoPtr& err);
+                          const SymbolEntryPtr& entry);
 
             void loadTheory(const std::string& theory);
 

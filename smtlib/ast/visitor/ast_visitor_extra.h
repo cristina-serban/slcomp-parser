@@ -13,6 +13,11 @@
 
 namespace smtlib {
     namespace ast {
+        /* ===================================== Visitor1 ===================================== */
+        /**
+         * An extended visitor for the smtlib::ast hierarchy,
+         * where each visit returns a result
+         */
         template<class RetT>
         class Visitor1 : public virtual Visitor0 {
         protected:
@@ -40,6 +45,11 @@ namespace smtlib {
             }
         };
 
+        /* ===================================== Visitor2 ===================================== */
+        /**
+         * An extended visitor for the smtlib::ast hierarchy,
+         * where each visit returns a result and takes an additional argument
+         */
         template<class RetT, class ArgT>
         class Visitor2 : public virtual Visitor0 {
         protected:
@@ -71,11 +81,15 @@ namespace smtlib {
             }
         };
 
+        /* ================================== DummyVisitor1 =================================== */
+        /** A dummy (empty) implementation of Visitor1 */
         template<class RetT>
         class DummyVisitor1 : public Visitor1<RetT>,
                               public DummyVisitor0 {
         };
 
+        /* ================================== DummyVisitor2 =================================== */
+        /** A dummy (empty) implementation of Visitor2 */
         template<class RetT, class ArgT>
         class DummyVisitor2 : public Visitor2<RetT, ArgT>,
                               public DummyVisitor0 {

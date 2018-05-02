@@ -161,7 +161,7 @@ string DeclareHeapCommand::toString() {
     stringstream ss;
     ss << "(" << KW_DECL_HEAP << " ";
 
-    for(auto const pair : locDataPairs) {
+    for(const auto &pair : locDataPairs) {
         ss << "(" << pair.first->toString() << " " << pair.second->toString() << ")";
     }
 

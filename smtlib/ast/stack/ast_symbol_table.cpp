@@ -6,53 +6,53 @@
 using namespace std;
 using namespace smtlib::ast;
 
-SortInfoPtr SymbolTable::getSortInfo(const string& name) {
+SortEntryPtr SymbolTable::getSortEntry(const string& name) {
     auto it = sorts.find(name);
     if (it != sorts.end()) {
         return it->second;
     } else {
-        SortInfoPtr empty;
+        SortEntryPtr empty;
         return empty;
     }
 }
 
-std::vector<FunInfoPtr> SymbolTable::getFunInfo(const string& name) {
+std::vector<FunEntryPtr> SymbolTable::getFunEntry(const string& name) {
     auto it = funs.find(name);
     if (it != funs.end()) {
         return it->second;
     } else {
-        std::vector<FunInfoPtr> empty;
+        std::vector<FunEntryPtr> empty;
         return empty;
     }
 }
 
-VarInfoPtr SymbolTable::getVarInfo(const string& name) {
+VarEntryPtr SymbolTable::getVarEntry(const string& name) {
     auto it = vars.find(name);
     if (it != vars.end()) {
         return it->second;
     } else {
-        VarInfoPtr empty;
+        VarEntryPtr empty;
         return empty;
     }
 }
 
-bool SymbolTable::add(const SortInfoPtr& info) {
-    if(sorts.find(info->name) == sorts.end()) {
-        sorts[info->name] = info;
+bool SymbolTable::add(const SortEntryPtr& entry) {
+    if(sorts.find(entry->name) == sorts.end()) {
+        sorts[entry->name] = entry;
         return true;
     } else {
         return false;
     }
 }
 
-bool SymbolTable::add(const FunInfoPtr& info) {
-    funs[info->name].push_back(info);
+bool SymbolTable::add(const FunEntryPtr& entry) {
+    funs[entry->name].push_back(entry);
     return true;
 }
 
-bool SymbolTable::add(const VarInfoPtr& info) {
-    if(vars.find(info->name) == vars.end()) {
-        vars[info->name] = info;
+bool SymbolTable::add(const VarEntryPtr& entry) {
+    if(vars.find(entry->name) == vars.end()) {
+        vars[entry->name] = entry;
         return true;
     } else {
         return false;
@@ -64,33 +64,33 @@ void SymbolTable::reset() {
     vars.clear();
 
     // Erase sort information that does not come from theory files
-    std::vector<SortInfoPtr> sortInfos;
+    std::vector<SortEntryPtr> sortEntries;
     for (const auto& sort : sorts) {
-        sortInfos.push_back(sort.second);
+        sortEntries.push_back(sort.second);
     }
 
-    for (const auto& sortInfo : sortInfos) {
-        if(!dynamic_pointer_cast<SortSymbolDeclaration>(sortInfo->source)) {
-            sorts.erase(sortInfo->name);
+    for (const auto& sortEntry : sortEntries) {
+        if(!dynamic_pointer_cast<SortSymbolDeclaration>(sortEntry->source)) {
+            sorts.erase(sortEntry->name);
         }
     }
 
     // Erase function information that does not come from theory files
     vector<string> funKeys;
-    vector<std::vector<FunInfoPtr>> funInfos;
+    vector<std::vector<FunEntryPtr>> funEntry;
     for (const auto& fun : funs) {
         funKeys.push_back(fun.first);
-        funInfos.push_back(fun.second);
+        funEntry.push_back(fun.second);
     }
 
     for (int i = 0; i < funKeys.size(); i++) {
-        std::vector<FunInfoPtr>& info = funs[funKeys[i]];
-        for (int j = 0; j < funInfos[i].size(); j++) {
-            if(!dynamic_pointer_cast<FunSymbolDeclaration>(funInfos[i][j]->source)) {
-                info.erase(info.begin() + j);
+        std::vector<FunEntryPtr>& entry = funs[funKeys[i]];
+        for (int j = 0; j < funEntry[i].size(); j++) {
+            if(!dynamic_pointer_cast<FunSymbolDeclaration>(funEntry[i][j]->source)) {
+                entry.erase(entry.begin() + j);
             }
         }
-        if(info.empty())
+        if(entry.empty())
             funs.erase(funKeys[i]);
     }
 }

@@ -8,8 +8,8 @@ Help
  
  Unwatch 1
   Star 0
- Fork 0cristina-serban/slparser
- branch: master  slparser/docs/Doxyfile
+ Fork 0cristina-serban/slcomp-parser
+ branch: master  slcomp-parser/docs/Doxyfile
 @cristina-serbancristina-serban on Mar 9 Documentation
 1 contributor
 RawBlameHistory    2304 lines (1775 sloc)  100.231 kb
@@ -47,7 +47,7 @@ DOXYFILE_ENCODING      = UTF-8
 # title of most generated pages and in a few other places.
 # The default value is: My Project.
 
-PROJECT_NAME           = "Parse SMT-LIB"
+PROJECT_NAME           = "SL-COMP parser"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. This
 # could be handy for archiving the generated documentation or if some version
