@@ -12,7 +12,7 @@ Parser for SL-COMP'18.
 ## Required files ##
 The files containing the definitions of theories and logics, located in `input/Theories` and `input/Logics`, are required for handling the input scripts.
 
-Some sample script inputs can be found in `input\Scripts`.
+Some sample script inputs can be found in `input/Scripts`.
 
 ## Compiling the Flex/Bison parser ##
 To compile the files `smtlib/parser/smtlib-bison-parser.y` and `smtlib/parser/smtlib-flex-lexer.l`, go to the `parser` directory and run `make`. If these files are changed, they need to be recompiled.
