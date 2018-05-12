@@ -478,6 +478,9 @@ sep::DefineSortCommandPtr Translator::translate(const ast::DefineSortCommandPtr&
     auto result = make_shared<sep::DefineSortCommand>(cmd->symbol->value,
                                                       std::move(newParams),
                                                       std::move(translate(cmd->sort)));
+
+    setFileLocation(result, cmd);
+    return result;
 }
 
 sep::EchoCommandPtr Translator::translate(const ast::EchoCommandPtr& cmd) {
@@ -922,6 +925,8 @@ sep::SpecConstantPtr Translator::translate(const ast::SpecConstantPtr& constant)
     if (const3) {
         return translate(const3);
     }
+
+    return sep::SpecConstantPtr();
 }
 
 sep::DecimalLiteralPtr Translator::translate(const ast::DecimalLiteralPtr& literal) {
@@ -965,6 +970,8 @@ sep::SExpressionPtr Translator::translate(const ast::SExpressionPtr& exp) {
     if (exp4) {
         return translate(exp4);
     }
+
+    return sep::SExpressionPtr();
 }
 
 sep::CompSExpressionPtr Translator::translate(const ast::CompSExpressionPtr& exp) {

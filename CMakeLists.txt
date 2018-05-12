@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 2.8.4)
 project(slcomp-parser)
 
 set(LIB_FLEX fl)
-set(LIB_CVC4 cvc4)
-set(LIB_GMP gmp)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated")
 
 # CVC4 with `make install`
@@ -144,4 +142,4 @@ set(SOURCE_FILES
         util/logger.cpp)
 
 add_executable(slcomp-parser ${SOURCE_FILES})
-target_link_libraries(slcomp-parser ${LIB_CVC4} ${LIB_GMP} ${LIB_FLEX})
+target_link_libraries(slcomp-parser ${LIB_CVC4})

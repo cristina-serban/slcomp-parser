@@ -647,7 +647,6 @@ AstPtr ast_newDeclareDatatypesCommand(AstList sorts, AstList declarations) {
 }
 
 AstPtr ast_newDeclareFunCommand(AstPtr symbol, AstList params, AstPtr sort) {
-    vector<SortPtr> v();
     DeclareFunCommandPtr ptr = make_shared<DeclareFunCommand>(std::move(share<Symbol>(symbol)),
                                                               std::move(params->unwrap<Sort>()),
                                                               std::move(share<Sort>(sort)));
