@@ -27,19 +27,21 @@ To erase the generated code, run `make clean`.
 ## Building and running the project ##
 (1) Before building the project, make sure the files `smtlib/parser/smtlib-bison-parser.y.c`, `smtlib/parser/smtlib-bison-parser.y.h` and `smtlib/parser/smtlib-flex-lexer.l.c` have been generated. If any of these files is missing, see section ["Compiling the Flex/Bison parser" above](https://github.com/cristina-serban/inductor/blob/master/README.md#compiling-the-parser).
 
-(2) Run `make`. This creates the executable `slcomp-parser` which can parse a list of file inputs.
+(2) Run `cmake`. This creates a `Makefile`.
+
+(3) Run `make`. This creates the executable `slcomp-parser` which can parse a list of file inputs.
 ```
 .../slcomp-parser$ make
 .../slcomp-parser$ ./slcomp-parser input_file_path1 input_file_path2 input_file_path3 ...
 ```
 
-(3) As an example, here is how you would run the sample scripts in `input/Scripts`:
+(4) As an example, here is how you would run the sample scripts in `input/Scripts`:
 ```
 .../slcomp-parser$ ./slcomp-parser input/Scripts/01.tst.smt2.sl2
 ```
 
 ## Generating documentation ##
 ```
-.../inductor$ doxygen
+.../slcomp-parser$ doxygen
 ```
 The documentation in `html` format is generated in the `docs` folder. Open the `docs/index.html` file in a browser.

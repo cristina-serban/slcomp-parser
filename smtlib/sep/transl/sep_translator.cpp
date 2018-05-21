@@ -925,12 +925,7 @@ sep::SpecConstantPtr Translator::translate(const ast::SpecConstantPtr& constant)
     if (const3) {
         return translate(const3);
     }
-<<<<<<< HEAD
-
     return sep::SpecConstantPtr();
-=======
-    return translate(constant); // unreachable
->>>>>>> fix compilation problems
 }
 
 sep::DecimalLiteralPtr Translator::translate(const ast::DecimalLiteralPtr& literal) {
@@ -974,12 +969,7 @@ sep::SExpressionPtr Translator::translate(const ast::SExpressionPtr& exp) {
     if (exp4) {
         return translate(exp4);
     }
-<<<<<<< HEAD
-
     return sep::SExpressionPtr();
-=======
-    return translate(exp); // unreachable
->>>>>>> fix compilation problems
 }
 
 sep::CompSExpressionPtr Translator::translate(const ast::CompSExpressionPtr& exp) {
