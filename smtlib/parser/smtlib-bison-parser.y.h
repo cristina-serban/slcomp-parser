@@ -115,13 +115,13 @@ extern int smt_yydebug;
 
 union SMT_YYSTYPE
 {
-#line 20 "smtlib-bison-parser.y" /* yacc.c:1909  */
+#line 20 "smtlib-bison-parser.y" /* yacc.c:1915  */
 
 	AstPtr ptr;
 	AstList list;
 	AstPairList pairList;
 
-#line 125 "smtlib-bison-parser.tab.h" /* yacc.c:1909  */
+#line 125 "smtlib-bison-parser.tab.h" /* yacc.c:1915  */
 };
 
 typedef union SMT_YYSTYPE SMT_YYSTYPE;

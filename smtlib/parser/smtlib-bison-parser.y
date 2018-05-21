@@ -3,7 +3,7 @@
 #include "smtlib-glue.h"
 
 int yylex();
-int yyerror(SmtPrsr parser, const char *);
+void yyerror(SmtPrsr parser, const char *);
 
 #define YYMAXDEPTH 300000
 #define YYINITDEPTH 300000
@@ -1924,7 +1924,7 @@ logic_attr_plus:
 
 %%
 
-int yyerror(SmtPrsr parser, const char* s) {
+void yyerror(SmtPrsr parser, const char* s) {
 	ast_reportError(parser, yylloc.first_line, yylloc.first_column,
 					yylloc.last_line, yylloc.last_column, s);
 }
