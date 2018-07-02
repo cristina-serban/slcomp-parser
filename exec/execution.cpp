@@ -98,7 +98,7 @@ bool Execution::checkSortedness() {
 
     sortednessCheckAttempted = true;
 
-    if (!checkSyntax()) {
+    if (!parse()) {
         //Logger::error("SmtExecution::checkSortedness()", "Stopped due to previous errors");
         return false;
     }
